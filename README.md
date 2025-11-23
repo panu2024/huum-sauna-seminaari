@@ -3,6 +3,7 @@ Seminaarityön tavoitteena oli toteuttaa järjestelmä, joka pystyy käynnistäm
 Toteutin pythonpohjaisern saunaohjaimen joka kommunikoi huum APIn kanssa. Järjestelmä pystyy tarkistamaan saunan tilan ja käynnistämään, sekä sammuttamaan saunan oikeaan aikaan iCAL kalentirin perusteella.
 
 Arkkitehtuuri 
+
 Main.py tarjoaa 
 API reitit ja käyttöliittymän.
 
@@ -11,14 +12,18 @@ Huum saunan tarjoamat api materiaalit on pyydetty suoraan kiukaan valmistajalta 
 
 
 Mitä opin 
+
 Opin miten google cloudissa voi ajaa omia python ohjelmia esim google cloud run tai ajastetut jobit. 
 Opin miten tehdään http ja api kutsuja ja miten iCAl kalenteridataa luetaan (alku ja loppuajat) käynnistyksiä varten.
 Miten suunnitellaan käytännön ajastuslogiikka, jossa otetaan huomioon milloin kannattaa käynnistää ja milloin kannattaa sammuttaa.
 
+
 Jatkokehitysideoita
+
 Enemmän ominaisuuksia visuaaliseen käyttöliittymään ja parempi turvallisuus esim salasanoille paremmat paikat.
 
 
 Lähteet
+
 Huumin lähettämä API dokumentaatio.
 ChatGPT:tä on hyödynnetty tämän kokonaisuuden suunnittelussa ja koodin toteutuksessa.
