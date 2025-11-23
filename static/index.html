@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="fi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rantasauna</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: linear-gradient(to right, #ffecd2 0%, #fcb69f 100%);
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 500px;
+      margin: 50px auto;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+    h1 {
+      font-size: 2.5em;
+      color: #333;
+    }
+    #lampotila {
+      font-size: 1.2em;
+      margin-top: 30px;
+    }
+    #automaatti-info {
+      margin-top: 10px;
+      font-size: 1em;
+      color: green;
+    }
+    ol {
+      padding-left: 20px;
+    }
+    ol li {
+      margin-bottom: 6px;
+      white-space: normal;
+      word-break: break-word;
+    }
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 2em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔥 Rantasauna</h1>
+
+    <div id="lampotila">🌡️ Ladataan saunan lämpötilaa...</div>
+    <div id="automaatti-info"></div>
+
+    <div id="varaukset" style="margin-top: 30px; text-align: left;">
+      <h3>Tulevat saunavuorot (7 päivää):</h3>
+      <ol id="varauslista"></ol>
+    </div>
+  </div>
+
+  <script>
+    async function haeLampotila() {
+      try {
+        const response = await fetch('/status');
+        const data = await response.json();
+
+        if ('temperature' in data) {
+          document.getElementById('lampotila').textContent = `🌡️ Saunan lämpötila: ${data.temperature} °C`;
+        }
+
+        const infoEl = document.getElementById('automaatti-info');
+        if (data.automaattinen && data.timestamp) {
+          const aika = new Date(data.timestamp).toLocaleString('fi-FI');
+          infoEl.textContent = `✅ Sauna käynnistetty automaattisesti kalenterin perusteella ${aika}`;
+        } else {
+          infoEl.textContent = "";
+        }
+      } catch (e) {
+        document.getElementById('lampotila').textContent = '❌ Lämpötilan haku epäonnistui';
+      }
+    }
+
+    async function haeVaraukset() {
+      try {
+        const response = await fetch('/reservations');
+        const data = await response.json();
+        const lista = document.getElementById('varauslista');
+        lista.innerHTML = '';
+
+        data.sort((a, b) => new Date(a.aika) - new Date(b.aika));
+
+        data.forEach((varaus) => {
+          const aika = new Date(varaus.aika);
+          const paiva = aika.toLocaleDateString('fi-FI', {
+            weekday: 'long',
+            day: 'numeric',
+            month: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          const li = document.createElement('li');
+          li.textContent = `${paiva}: ${varaus.otsikko}`;
+          lista.appendChild(li);
+        });
+
+      } catch (e) {
+        const lista = document.getElementById('varauslista');
+        lista.innerHTML = '<li>❌ Varausten haku epäonnistui</li>';
+      }
+    }
+
+    setInterval(haeLampotila, 10000);
+    setInterval(haeVaraukset, 5 * 60 * 1000);
+    haeLampotila();
+    haeVaraukset();
+  </script>
+</body>
+</html>
