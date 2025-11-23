@@ -10,20 +10,16 @@ from aiohttp import web, ClientSession, ClientTimeout
 from icalendar import Calendar
 from huum.huum import Huum
 
-# -----------------------------
-# Peruslogitus Cloud Runiin
-# -----------------------------
+
 logging.basicConfig(stream=sys.stdout, level=logging.INFO, format="%(levelname)s %(message)s")
 log = logging.getLogger("sauna")
 
 def log_exc(msg: str, e: Exception):
     log.error("%s: %r\n%s", msg, e, traceback.format_exc())
 
-# -----------------------------
-# Konfiguraatio (pidetään kovat arvot kuten pyysit)
-# -----------------------------
-KÄYTTÄJÄTUNNUS = "aleksi@polkunuuksio.com"
-SALASANA = "Poromakaa22"
+
+KÄYTTÄJÄTUNNUS = "**********"
+SALASANA = "***********"
 
 TAVOITE_LAMPOTILA = 92
 KESTO_SEKUNTEINA = 60 * 60
@@ -33,9 +29,7 @@ ICAL_TIMEOUT = ClientTimeout(total=15, connect=5)
 
 routes = web.RouteTableDef()
 
-# -----------------------------
-# UI & Health
-# -----------------------------
+
 @routes.get("/")
 async def index(request):
     return web.FileResponse(path="static/index.html")
@@ -44,14 +38,9 @@ async def index(request):
 async def healthz(request):
     return web.Response(text="ok")
 
-# -----------------------------
-# HUUM apu: hallittu session-käyttö
-# -----------------------------
+
 async def with_huum_session(fn):
-    """
-    Avaa HUUM-sesio, aja fn(huum), sulje sessio.
-    Palauttaa (data, error_text, http_status)
-    """
+
     huum = Huum(username=KÄYTTÄJÄTUNNUS, password=SALASANA)
     try:
         await huum.open_session()
@@ -70,9 +59,7 @@ async def with_huum_session(fn):
         except Exception as e:
             log_exc("HUUM close_session failed", e)
 
-# -----------------------------
-# Start / Stop / Status
-# -----------------------------
+
 @routes.post("/start")
 async def start_sauna(request):
     data = await request.post()
@@ -108,7 +95,7 @@ async def sauna_status(request):
 
     status, err, code = await with_huum_session(_do)
 
-    # Lue tila.json turvallisesti (Cloud Run -instanssit voivat vaihdella)
+    
     automaattinen = False
     timestamp = None
     try:
@@ -121,7 +108,7 @@ async def sauna_status(request):
         log_exc("tila.json read failed", e)
 
     if status is None:
-        # HUUM ei vastaa / Starlink poikki / muu virhe → kerrotaan siististi
+        
         return web.json_response({
             "temperature": None,
             "is_on": False,
@@ -143,9 +130,7 @@ async def sauna_status(request):
         "timestamp": timestamp
     })
 
-# -----------------------------
-# iCal /reservations
-# -----------------------------
+
 @routes.get("/reservations")
 async def hae_varaukset(request):
     try:
@@ -167,7 +152,7 @@ async def hae_varaukset(request):
                 alku = component.get("dtstart").dt
                 otsikko = str(component.get("summary"))
                 if isinstance(alku, datetime.datetime):
-                    # normalisoi aikavyöhyke UTC:hen
+                    
                     if alku.tzinfo is None:
                         alku = alku.replace(tzinfo=datetime.timezone.utc)
                     else:
@@ -184,12 +169,11 @@ async def hae_varaukset(request):
         log_exc("reservations failed", e)
         return web.json_response({"error": str(e)}, status=500)
 
-# -----------------------------
-# App
-# -----------------------------
+
 app = web.Application()
 app.add_routes(routes)
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 8080))
     web.run_app(app, host="0.0.0.0", port=port)
+
