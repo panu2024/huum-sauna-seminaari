@@ -5,7 +5,7 @@ Toteutin pythonpohjaisern saunaohjaimen joka kommunikoi huum APIn kanssa. Järje
 Arkkitehtuuri 
 
 Main.py tarjoaa 
-API reitit ja käyttöliittymän.
+API reitit ja index.html käyttöliittymän.
 
 Chacker.py hakee kalenteri varauksia ja kertoo pitääkö sauna laittaa päälle vai sammuttaa varausten perusteella. 
 Huum saunan tarjoamat api materiaalit on pyydetty suoraan kiukaan valmistajalta sähköpostilla ja niiden avulla mahdollista ohjata saunaa. Tällä hetkellä tämä projecti pyörii google cloud runissa.
